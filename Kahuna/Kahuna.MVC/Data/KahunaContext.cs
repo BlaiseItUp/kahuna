@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Kahuna.MVC.Data
+namespace Kahuna.MVC.data
 {
     public partial class KahunaContext : DbContext
     {
@@ -29,7 +29,7 @@ namespace Kahuna.MVC.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS; Database=Kahuna; Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Kahuna;Trusted_Connection=True;");
             }
         }
 
@@ -37,19 +37,73 @@ namespace Kahuna.MVC.Data
         {
             modelBuilder.Entity<Client>(entity =>
             {
-                entity.Property(e => e.ClientId).ValueGeneratedNever();
+                entity.Property(e => e.ClientId)
+                    .HasColumnName("ClientID")
+                    .ValueGeneratedNever();
 
-                entity.Property(e => e.ZipCode).IsFixedLength();
+                entity.Property(e => e.Address)
+                    .IsRequired()
+                    .HasColumnName("Address(...)")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Cfname)
+                    .IsRequired()
+                    .HasColumnName("CFName")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Clname)
+                    .IsRequired()
+                    .HasColumnName("CLName")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CriminalRecord).HasMaxLength(50);
+
+                entity.Property(e => e.Military).HasMaxLength(50);
+
+                entity.Property(e => e.Phone)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.ZipCode)
+                    .IsRequired()
+                    .HasMaxLength(5)
+                    .IsFixedLength();
             });
 
             modelBuilder.Entity<Employee>(entity =>
             {
-                entity.Property(e => e.EmpId).ValueGeneratedNever();
+                entity.HasKey(e => e.EmpId);
+
+                entity.Property(e => e.EmpId)
+                    .HasColumnName("EmpID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Efname)
+                    .IsRequired()
+                    .HasColumnName("EFName")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Elname)
+                    .IsRequired()
+                    .HasColumnName("ELName")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Position)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<Payment>(entity =>
             {
-                entity.Property(e => e.PaymentId).ValueGeneratedNever();
+                entity.Property(e => e.PaymentId)
+                    .HasColumnName("PaymentID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ClientId).HasColumnName("ClientID");
+
+                entity.Property(e => e.Date).HasColumnType("datetime");
+
+                entity.Property(e => e.Soid).HasColumnName("SOID");
 
                 entity.HasOne(d => d.So)
                     .WithMany(p => p.Payment)
@@ -60,12 +114,36 @@ namespace Kahuna.MVC.Data
 
             modelBuilder.Entity<SalesOrderHistory>(entity =>
             {
-                entity.Property(e => e.HistId).ValueGeneratedNever();
+                entity.HasKey(e => e.HistId);
+
+                entity.ToTable("Sales_Order_History");
+
+                entity.Property(e => e.HistId)
+                    .HasColumnName("HistID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.EmpId).HasColumnName("EmpID");
+
+                entity.Property(e => e.Soid).HasColumnName("SOID");
+
+                entity.HasOne(d => d.So)
+                    .WithMany(p => p.SalesOrderHistory)
+                    .HasForeignKey(d => d.Soid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Sales_Order_History_Service_Order");
             });
 
             modelBuilder.Entity<SalesOrderLine>(entity =>
             {
                 entity.HasKey(e => new { e.EmpId, e.Soid, e.ServId });
+
+                entity.ToTable("Sales_Order_Line");
+
+                entity.Property(e => e.EmpId).HasColumnName("EmpID");
+
+                entity.Property(e => e.Soid).HasColumnName("SOID");
+
+                entity.Property(e => e.ServId).HasColumnName("ServID");
 
                 entity.HasOne(d => d.Emp)
                     .WithMany(p => p.SalesOrderLine)
@@ -83,23 +161,39 @@ namespace Kahuna.MVC.Data
                     .WithMany(p => p.SalesOrderLine)
                     .HasForeignKey(d => d.Soid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Sales_Order_Line_Sales_Order_History");
-
-                entity.HasOne(d => d.SoNavigation)
-                    .WithMany(p => p.SalesOrderLine)
-                    .HasForeignKey(d => d.Soid)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Sales_Order_Line_Service_Order");
             });
 
             modelBuilder.Entity<Service>(entity =>
             {
-                entity.Property(e => e.ServId).ValueGeneratedNever();
+                entity.HasKey(e => e.ServId);
+
+                entity.Property(e => e.ServId)
+                    .HasColumnName("ServID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Price).HasColumnType("money");
+
+                entity.Property(e => e.ServName)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<ServiceHistory>(entity =>
             {
-                entity.Property(e => e.Shid).ValueGeneratedNever();
+                entity.HasKey(e => e.Shid);
+
+                entity.ToTable("Service_History");
+
+                entity.Property(e => e.Shid)
+                    .HasColumnName("SHID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Soid).HasColumnName("SOID");
+
+                entity.Property(e => e.StartDate).HasColumnType("datetime");
 
                 entity.HasOne(d => d.So)
                     .WithMany(p => p.ServiceHistory)
@@ -110,7 +204,27 @@ namespace Kahuna.MVC.Data
 
             modelBuilder.Entity<ServiceOrder>(entity =>
             {
-                entity.Property(e => e.Soid).ValueGeneratedNever();
+                entity.HasKey(e => e.Soid);
+
+                entity.ToTable("Service_Order");
+
+                entity.Property(e => e.Soid)
+                    .HasColumnName("SOID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ClientId).HasColumnName("ClientID");
+
+                entity.Property(e => e.DateCaseClosed).HasColumnType("datetime");
+
+                entity.Property(e => e.DateCaseOpened).HasColumnType("datetime");
+
+                entity.Property(e => e.DatePlaced).HasColumnType("datetime");
+
+                entity.Property(e => e.Decline).HasMaxLength(50);
+
+                entity.Property(e => e.Description).HasMaxLength(200);
+
+                entity.Property(e => e.Override).HasMaxLength(50);
 
                 entity.HasOne(d => d.Client)
                     .WithMany(p => p.ServiceOrder)
