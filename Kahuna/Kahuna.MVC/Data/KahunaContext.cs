@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Kahuna.MVC.data
+namespace Kahuna.MVC.Data
 {
     public partial class KahunaContext : DbContext
     {

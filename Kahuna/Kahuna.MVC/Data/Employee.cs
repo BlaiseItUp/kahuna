@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Kahuna.MVC.data
+namespace Kahuna.MVC.Data
 {
     public partial class Employee
     {
