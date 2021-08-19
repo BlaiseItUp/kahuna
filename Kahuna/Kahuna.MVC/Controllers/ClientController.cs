@@ -1,4 +1,5 @@
-﻿using Kahuna.MVC.Models;
+﻿using Kahuna.MVC.Data;
+using Kahuna.MVC.Models;
 using Kahuna.MVC.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,20 +12,20 @@ namespace Kahuna.MVC.Controllers
 {
     public class ClientController : Controller
     {        
+        private ClientRepository repo = new ClientRepository();
 
         // GET: ClientController
         public ActionResult Index()
         {
-            var clientRepo = new ClientRepository();
-            var clients = clientRepo.GetAll();
+            var clients = repo.GetAll();
             return View(clients);
         }
 
-        // GET: ClientController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+        //// GET: ClientController/Details/5
+        //public ActionResult Details(int id)
+        //{
+        //    return View();
+        //}
 
         // GET: ClientController/Create
         public ActionResult Create()
@@ -33,15 +34,16 @@ namespace Kahuna.MVC.Controllers
         }
 
         // POST: ClientController/Create
-        [HttpPost]
+        [HttpPost, Route("{action}")]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Client client)
         {
             try
             {
+                repo.Add(client);
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception exception)
             {
                 return View();
             }
@@ -56,14 +58,15 @@ namespace Kahuna.MVC.Controllers
         // POST: ClientController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Client c)
         {
             try
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception exception)
             {
+
                 return View();
             }
         }

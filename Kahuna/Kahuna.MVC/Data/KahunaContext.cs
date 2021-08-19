@@ -29,7 +29,7 @@ namespace Kahuna.MVC.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Kahuna;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=MSI\\SQLEXPRESS;Database=Kahuna;Trusted_Connection=True;");
             }
         }
 
@@ -37,9 +37,10 @@ namespace Kahuna.MVC.Data
         {
             modelBuilder.Entity<Client>(entity =>
             {
+                entity.HasKey(e => e.ClientId);
+
                 entity.Property(e => e.ClientId)
-                    .HasColumnName("ClientID")
-                    .ValueGeneratedNever();
+                    .HasColumnName("ClientId");
 
                 entity.Property(e => e.Address)
                     .IsRequired()

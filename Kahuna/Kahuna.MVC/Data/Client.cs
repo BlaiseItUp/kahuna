@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Kahuna.MVC.Data
 {
@@ -11,7 +13,11 @@ namespace Kahuna.MVC.Data
         }
 
         public int ClientId { get; set; }
+        [Required]
+        [DisplayName("First Name")]
         public string Cfname { get; set; }
+        [DisplayName("Last Name")]
+        [Required]
         public string Clname { get; set; }
         public int Age { get; set; }
         public string Phone { get; set; }
